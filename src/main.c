@@ -6,21 +6,34 @@
 
 #include <msp430.h>
 #include <stdint.h>
-#include "uart.h" // setup_led, setup_timer, set_duty_cycle
+#include "adc.h"
+#include "stepper_motor.h" // init_stepper_driver
+#include "uart.h" // setup_timer, set_duty_cycle
 
-void stop_wdt() {
-    WDTCTL = WDTPW | WDTHOLD;  // stop watchdog timer
-}
+/**
+ * stops the watchdog timer
+ */
+void stop_wdt();
+
+/**
+ * USCI_A1 inntertupt service routine
+ */
+void __attribute__((interrupt(USCI_A1_VECTOR))) USCI_A1_ISR (void);
 
 int main(void)
 {
     stop_wdt();
-    setup_uart();
+    init_uart();
+    init_stepper_driver();
     __bis_SR_register(LPM0_bits + GIE);       // Enter LPM0, interrupts enabled
 
 }
 
-// Echo back RXed character, confirm TX buffer is ready first
+void stop_wdt()
+{
+    WDTCTL = WDTPW | WDTHOLD;  // stop watchdog timer
+}
+
 void __attribute__((interrupt(USCI_A1_VECTOR))) USCI_A1_ISR (void)
 {
     uint8_t byteIn = UCA1RXBUF;

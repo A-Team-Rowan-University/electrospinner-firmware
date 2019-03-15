@@ -9,6 +9,7 @@ MSP430_SUPPORT_FILES_INCLUDE=/opt/msp430-gcc-support-files/include
 SRCDIR=src
 INCLUDE_DIR=include
 BINDIR=bin
+DOCSDIR=docs
 
 SOURCES:=$(wildcard $(SRCDIR)/*.c)
 INCLUDES:=-I$(MSP430_SUPPORT_FILES_INCLUDE) -I$(INCLUDE_DIR)
@@ -24,4 +25,10 @@ run:
 	@mspdebug tilib "prog $(BINDIR)/$(TARGET)"
 
 clean:
-	@rm $(BINDIR)/* || true
+	@rm -rf $(BINDIR)/*
+
+format:
+	@astyle --project -r "$(SRCDIR)/*.c" -r "$(INCLUDE_DIR)/*.h"
+
+doc:
+	@cd $(DOCSDIR) && doxygen
